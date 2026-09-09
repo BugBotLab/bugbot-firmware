@@ -69,7 +69,7 @@ Removed: `beep()`. The new robot has no buzzer. Lessons that used a beep use `le
 
 | Function | Targets | Returns |
 |---|---|---|
-| `set_cv(mode)` | R P S | `"apriltag"`, `"blob"`, `"contour"`, `"face"`, `"none"`. Runs on the P4. |
+| `set_cv(mode, colour=None)` | R P S | `"apriltag"`, `"blob"`, `"contour"`, `"face"`, `"none"`. Runs on the P4. `"blob"` needs the colour to track: `"red"`, `"green"`, `"blue"` or `"yellow"` (one detector, one colour at a time). |
 | `apriltags()` | R P S | list of `[id, cx_px, cy_px, dist_cm]`. |
 | `blobs()` | R P S | list of `[cx, cy, area, x0, y0, x1, y1, aspect]`. |
 | `edges()` | R P S | `[edge_count, dominant_angle_deg]`. |
