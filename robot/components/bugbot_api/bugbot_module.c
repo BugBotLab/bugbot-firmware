@@ -164,7 +164,8 @@ static bool bb_servo(int argc, py_StackRef argv) {
     float idx, deg;
     if (!get_float(argv, 0, &idx) || !get_float(argv, 1, &deg)) return false;
     if (idx != 0 && idx != 1) return ValueError("servo index must be 0 or 1");
-    if (deg < 0) deg = 0; if (deg > 180) deg = 180;
+    if (deg < 0) deg = 0;
+    if (deg > 180) deg = 180;
     bugbot_shim_servo((uint8_t)idx, deg);
     py_newnone(py_retval()); return true;
 }

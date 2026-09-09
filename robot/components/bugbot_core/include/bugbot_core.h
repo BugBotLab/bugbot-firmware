@@ -3,6 +3,7 @@
 #pragma once
 #include <stdbool.h>
 #include <stdint.h>
+#include <stddef.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -16,6 +17,11 @@ extern "C" {
 
 /* boot: drivers, then the 100 Hz control task, the 50 Hz fusion task, the camera task */
 void bugbot_core_start(void);
+
+/* the interpreter is plugged in at boot (bugbot_api provides it), so core does not depend on it */
+typedef int (*bugbot_runner_t)(const char *src);   /* returns 0 on success; prints BUGBOT RUNNING/DONE/ERROR */
+void bugbot_core_set_runner(bugbot_runner_t fn);
+int  bugbot_core_exec(const char *src);
 
 /* the program runner: the console hands it a program, it runs it on the interpreter task */
 void bugbot_core_run_program(const char *src, size_t len);

@@ -19,6 +19,7 @@
 #include "esp_timer.h"
 #include <math.h>
 #include <string.h>
+#include <stdlib.h>
 
 /* ---- shared state ---------------------------------------------------------- */
 static struct {
@@ -162,9 +163,6 @@ int bugbot_shim_motor_ok(void) { return drv_motor_probe(); }
 int bugbot_shim_motor_raw_test(uint32_t ms) { drv_motor_set(0, 0.5f); vTaskDelay(pdMS_TO_TICKS(ms)); drv_motor_set(0, 0); return 1; }
 
 /* ---- program runner ------------------------------------------------------------- */
-extern void bugbot_module_init(void);
-extern int  bugbot_py_exec(const char *src);   /* console.c: runs on the interpreter */
-
 bool bugbot_core_program_running(void) { return S.program_running; }
 void bugbot_core_stop_program(void) { S.stop_program = true; bugbot_shim_stop(); }
 
@@ -172,7 +170,7 @@ static char *pending_src;
 static void python_task(void *arg) {
     (void)arg;
     S.program_running = true; S.stop_program = false;
-    bugbot_py_exec(pending_src);
+    bugbot_core_exec(pending_src);
     free(pending_src); pending_src = NULL;
     bugbot_shim_stop();
     S.program_running = false;

@@ -17,8 +17,8 @@ Phase A skeleton, written before the boards arrive. It compiles the structure, n
 | `robot/` | ESP-IDF project for the ESP32-P4 |
 | `robot/main/` | `main.c`: boot, tasks, the USB console that runs programs |
 | `robot/components/pocketpy/` | the interpreter (vendored) |
-| `robot/components/bugbot_api/` | `bugbot_module.c` (the Python `bugbot` module, contract v1) and `bugbot_shims.h` (the C functions it calls) |
-| `robot/components/bugbot_core/` | control loop, sensor fusion, safety: the owners of the shims |
+| `robot/components/bugbot_api/` | `bugbot_module.c`, the Python `bugbot` module (contract v1) |
+| `robot/components/bugbot_core/` | control loop, sensor fusion, safety, the USB console; `bugbot_shims.h` is the C surface the Python module calls |
 | `robot/components/drivers/` | one driver per device: DRV8830 x4, PMW3360, BNO055, VL53L5CX, OV5647, WS2812, servos, battery sense |
 | `dongle/` | ESP-IDF project for the USB dongle: USB CDC to Wi-Fi bridge |
 | `docs/` | hardware notes the firmware must honour, the USB protocol, the dongle protocol |

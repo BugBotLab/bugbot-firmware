@@ -1,4 +1,4 @@
-/* console.c: the USB CDC console the IDE talks to (docs/PROTOCOL_USB.md), and the pocketpy runner.
+/* console.c: the USB CDC console the IDE talks to (docs/PROTOCOL_USB.md).
  *
  * Lines:  BUGBOT HELLO            -> BUGBOT <fw> CONTRACT <n>
  *         BUGBOT RUN <bytes>\n<program>   -> BUGBOT RUNNING ... BUGBOT DONE | BUGBOT ERROR <msg>
@@ -6,33 +6,23 @@
  *         BUGBOT SAVE <bytes>\n<program>  -> stored as main.py, run at power-up
  * Anything the program prints goes back as plain lines.
  *
- * SKELETON: the CDC transport is ESP-IDF's usb_serial_jtag / tinyusb CDC on the P4; the read loop
- * here is the framing only.
+ * The interpreter is not a dependency of this component: bugbot_api registers its runner
+ * with bugbot_core_set_runner() at boot (main.c), so core never links against pocketpy.
+ *
+ * SKELETON: the CDC transport is TinyUSB CDC on the P4; the read loop here is the framing only.
  */
 #include "bugbot_core.h"
-#include "pocketpy.h"
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
 
-extern void bugbot_module_init(void);
+static bugbot_runner_t runner;
 
-static void py_print(const char *s) { fputs(s, stdout); fflush(stdout); }
+void bugbot_core_set_runner(bugbot_runner_t fn) { runner = fn; }
 
-int bugbot_py_exec(const char *src) {
-    static bool inited;
-    if (!inited) { py_initialize(); py_callbacks()->print = py_print; bugbot_module_init(); inited = true; }
-    printf("BUGBOT RUNNING\n");
-    bool ok = py_exec(src, "<program>", EXEC_MODE, NULL);
-    if (!ok) {
-        char *msg = py_formatexc();
-        printf("BUGBOT ERROR %s\n", msg ? msg : "unknown");
-        free(msg);
-        py_clearexc(NULL);
-        return 1;
-    }
-    printf("BUGBOT DONE\n");
-    return 0;
+int bugbot_core_exec(const char *src) {
+    if (!runner) { printf("BUGBOT ERROR no interpreter\n"); return 1; }
+    return runner(src);
 }
 
 static bool read_line(char *buf, size_t n) {
