@@ -14,6 +14,7 @@ extern "C" {
 /* program control */
 bool     bugbot_shim_should_stop(void);          /* true once the IDE/console asked to stop the script */
 void     bugbot_shim_delay_ms(uint32_t ms);       /* yields the interpreter task */
+float    bugbot_shim_clock_s(void);               /* seconds since the current script started (clock()) */
 
 /* motion: components -100..100 in the robot frame (forward, right, clockwise). Feeds the deadman. */
 void     bugbot_shim_drive(float fwd, float lat, float rot);

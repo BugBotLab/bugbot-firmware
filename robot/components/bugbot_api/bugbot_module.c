@@ -136,6 +136,13 @@ static bool bb_wait(int argc, py_StackRef argv) {
     py_newnone(py_retval()); return true;
 }
 
+/* clock(): seconds since this script started. */
+static bool bb_clock(int argc, py_StackRef argv) {
+    (void)argc; (void)argv;
+    py_newfloat(py_retval(), bugbot_shim_clock_s());
+    return true;
+}
+
 /* ---- outputs ------------------------------------------------------------- */
 
 static const struct { const char *name; uint8_t r, g, b; } COLOURS[] = {
@@ -278,7 +285,7 @@ typedef struct { const char *name; py_CFunction fn; } entry_t;
 static const entry_t API[] = {
     {"forward", bb_forward}, {"backward", bb_backward}, {"left", bb_left}, {"right", bb_right},
     {"spin_left", bb_spin_left}, {"spin_right", bb_spin_right}, {"turn", bb_turn}, {"drive", bb_drive},
-    {"stop", bb_stop}, {"wait", bb_wait},
+    {"stop", bb_stop}, {"wait", bb_wait}, {"clock", bb_clock},
     {"led", bb_led}, {"servo", bb_servo},
     {"distance", bb_distance}, {"tof_grid", bb_tof_grid}, {"heading", bb_heading}, {"position", bb_position},
     {"velocity", bb_velocity}, {"imu", bb_imu}, {"battery", bb_battery},

@@ -105,6 +105,10 @@ void bugbot_core_start(void) {
 bool bugbot_shim_should_stop(void) { return S.stop_program; }
 void bugbot_shim_delay_ms(uint32_t ms) { vTaskDelay(pdMS_TO_TICKS(ms ? ms : 1)); }
 
+static int64_t script_t0_us;
+void  bugbot_core_mark_script_start(void) { script_t0_us = now_us(); }
+float bugbot_shim_clock_s(void) { return (float)(now_us() - script_t0_us) / 1e6f; }
+
 void bugbot_shim_drive(float fwd, float lat, float rot) {
     taskENTER_CRITICAL(&lock);
     S.cmd_fwd = fwd; S.cmd_lat = lat; S.cmd_rot = rot; S.last_cmd_us = now_us();

@@ -22,6 +22,7 @@ void bugbot_core_start(void);
 typedef int (*bugbot_runner_t)(const char *src);   /* returns 0 on success; prints BUGBOT RUNNING/DONE/ERROR */
 void bugbot_core_set_runner(bugbot_runner_t fn);
 int  bugbot_core_exec(const char *src);
+void bugbot_core_mark_script_start(void);   /* clock() counts from the last call */
 
 /* the program runner: the console hands it a program, it runs it on the interpreter task */
 void bugbot_core_run_program(const char *src, size_t len);

@@ -37,6 +37,7 @@ A function marked R P S behaves the same on all three. Nothing in version 1 is s
 | `drive(fwd, lat, rot=0)` | R P S | The primitive: three components, each -100 to 100, robot frame. Non-blocking. |
 | `stop()` | R P S | All motors off. |
 | `wait(seconds)` | R P S | Sleep, but keeps the deadman fed for the current motion and honours a stop request. |
+| `clock()` | R P S | Seconds since the program started, float. Simulated time in the sim. |
 
 Removed: the laptop's tank-style `drive(left, right)`; `left`/`right` as spins.
 

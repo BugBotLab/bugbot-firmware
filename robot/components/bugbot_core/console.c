@@ -22,6 +22,7 @@ void bugbot_core_set_runner(bugbot_runner_t fn) { runner = fn; }
 
 int bugbot_core_exec(const char *src) {
     if (!runner) { printf("BUGBOT ERROR no interpreter\n"); return 1; }
+    bugbot_core_mark_script_start();     /* clock() counts from here */
     return runner(src);
 }
 
