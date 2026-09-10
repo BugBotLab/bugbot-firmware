@@ -48,7 +48,7 @@ Removed: the laptop's tank-style `drive(left, right)`; `left`/`right` as spins.
 |---|---|---|
 | `led(colour)` or `led(r, g, b)` | R P S | The one RGB LED. Colour names: red, green, blue, yellow, cyan, magenta, white, orange, purple, pink, off. |
 | `servo(index, angle)` | R P S | index 0 or 1, angle 0 to 180. |
-| `grip()` | R P S | Close the gripper (servo 0). Returns True if it closed on a ball within about 2 cm of the front. Blocks ~0.3 s. |
+| `grip()` | R P S | Close the gripper (servo 0). Returns True if it closed on a ball (40 mm, ping-pong) within about 3 cm of the front. Blocks ~0.3 s. |
 | `release()` | R P S | Open the gripper, letting go of the ball. Blocks ~0.3 s. |
 | `holding()` | R P S | The colour of the ball in the gripper, or None. |
 | `kick(power=100)` | R P S | Fire the kicker (servo 1): the ball in front, held or in reach, shoots off along the heading. Power 0 to 100; 100 sends a ball about 80 cm on the mat. Returns True if it hit a ball. Blocks ~0.3 s. |
