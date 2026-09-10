@@ -109,4 +109,6 @@ This document is version 1. Firmware, dongle, laptop library and IDE each report
 Each implementation carries the same test script, `api_conformance.py`, which calls every function in this table and checks types, ranges and units. It runs in the sim in CI, on the laptop against a robot in proxy mode, and on the robot in upload mode before a release.
 
 
+The camera: a 120 degree (horizontal) wide-angle lens; detections are reported in a 320 x 240 frame, so the focal length is about 92 px: a thing `w` cm wide that shows `p` pixels wide is about `w * 92 / p` cm away, and a pixel near the middle of the picture is about 0.375 degrees (a wide lens squeezes the edges, so treat that as a rule of thumb, or use `atan((cx - 160) / 92)`).
+
 Tags on other robots: every BugBot wears an AprilTag on its body (ids from 100 up), so `apriltags()` reports other robots with their distance and bearing, the same as a marker. A lit LED on another robot shows up in `blobs()` as a small patch of the nearest named colour.
