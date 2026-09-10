@@ -23,7 +23,7 @@ void     bugbot_shim_keepalive(void);            /* wait() calls this to keep th
 
 /* sensors */
 float    bugbot_shim_distance_cm(void);           /* nearest object ahead from the ToF centre columns */
-bool     bugbot_shim_tof_grid_cm(uint16_t out[64]); /* 8x8 row-major, row 0 = far */
+bool     bugbot_shim_tof_grid_cm(uint16_t out[64]); /* 8x8 row-major, row 0 = top (looking up), row 7 = bottom (the mat); rows 2-3 level */
 float    bugbot_shim_heading_deg(void);           /* 0..360, clockwise positive, absolute, minus the reset offset */
 void     bugbot_shim_position_cm(float *x, float *y);
 void     bugbot_shim_velocity_cms(float *vx, float *vy);

@@ -47,7 +47,7 @@ void  drv_flow_read_cm(float *dx, float *dy);
 /* IMU: BNO055 in NDOF mode, degrees */
 void  drv_imu_read_deg(float *heading, float *pitch, float *roll);
 
-/* ToF: VL53L5CX 8x8, cm, row 0 = far */
+/* ToF: VL53L5CX 8x8, cm, row 0 = top of the view (looking up), row 7 = bottom (the mat) */
 bool  drv_tof_read_cm(uint16_t out[64]);
 
 /* battery */

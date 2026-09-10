@@ -55,7 +55,7 @@ Removed: `beep()`. The new robot has no buzzer. Lessons that used a beep use `le
 | Function | Targets | Returns |
 |---|---|---|
 | `distance()` | R P S | Nearest object ahead, cm, from the ToF grid's centre columns. |
-| `tof_grid()` | R P S | 64 ints, cm, 8x8 row-major; row 0 is the far side. |
+| `tof_grid()` | R P S | 64 ints, cm, 8x8 row-major, 45 x 45 degrees. Rows are elevation: row 0 looks up, row 7 down at the mat a few cm ahead; rows 2 and 3 look level. Column 0 is the left. |
 | `heading()` | R P S | Absolute heading, degrees 0 to 360. |
 | `position()` | R P S | `(x, y)` cm. |
 | `velocity()` | R P S | `(vx, vy)` cm/s from the optical-flow sensor, robot frame. New. |
