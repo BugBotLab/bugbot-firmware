@@ -41,7 +41,9 @@ typedef struct { int id; float cx, cy, dist_cm; } bugbot_tag_t;
 typedef struct { int cx, cy, area, x0, y0, x1, y1; float aspect; } bugbot_blob_t;
 typedef struct { int edge_count; float dominant_angle_deg; } bugbot_edges_t;
 typedef struct { int x1, y1, x2, y2; float score; int kp[10]; } bugbot_face_t;
-bool     bugbot_shim_set_cv(const char *mode);   /* "apriltag" | "blob" | "contour" | "face" | "none" */
+bool     bugbot_shim_set_cv(const char *mode, const char *colour);   /* "apriltag" | "blob" (+ colour) | "line" | "contour" | "face" | "none" */
+bool     bugbot_shim_line(float *cx_px, float *angle_deg);           /* the line on the mat ahead; false = none in view */
+bool     bugbot_shim_bumped(void);                                   /* accelerometer jolt in the last ~0.3 s */
 int      bugbot_shim_tag_count(void);
 bool     bugbot_shim_tag_get(int i, bugbot_tag_t *out);
 int      bugbot_shim_blob_count(void);

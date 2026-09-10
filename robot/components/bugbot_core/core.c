@@ -148,11 +148,20 @@ void bugbot_shim_reset_position(void) { taskENTER_CRITICAL(&lock); S.x_cm = S.y_
 void bugbot_shim_led(uint8_t r, uint8_t g, uint8_t b) { drv_led_set(r, g, b); }
 void bugbot_shim_servo(uint8_t index, float deg) { drv_servo_set(index, deg); }
 
-bool bugbot_shim_set_cv(const char *mode) {
-    static const char *modes[] = {"apriltag", "blob", "contour", "face", "none"};
-    for (unsigned i = 0; i < 5; i++) if (strcmp(mode, modes[i]) == 0) { strncpy(S.cv_mode, mode, sizeof S.cv_mode - 1); drv_camera_set_mode(mode); return true; }
+bool bugbot_shim_set_cv(const char *mode, const char *colour) {
+    static const char *modes[] = {"apriltag", "blob", "line", "contour", "face", "none"};
+    static const char *colours[] = {"red", "green", "blue", "yellow"};
+    if (strcmp(mode, "blob") == 0) {
+        bool ok = false;
+        if (colour) for (unsigned i = 0; i < 4; i++) if (strcmp(colour, colours[i]) == 0) ok = true;
+        if (!ok) return false;                      /* the blob detector tracks one colour, and it must be named */
+    }
+    for (unsigned i = 0; i < 6; i++) if (strcmp(mode, modes[i]) == 0) { strncpy(S.cv_mode, mode, sizeof S.cv_mode - 1); drv_camera_set_mode(mode); return true; }
     return false;
 }
+/* the line detector and the bump sense arrive with the camera pipeline and the IMU fusion; until then: nothing seen */
+bool bugbot_shim_line(float *cx_px, float *angle_deg) { (void)cx_px; (void)angle_deg; return false; }
+bool bugbot_shim_bumped(void) { return false; }
 int  bugbot_shim_tag_count(void) { return 0; }
 bool bugbot_shim_tag_get(int i, bugbot_tag_t *o) { (void)i; (void)o; return false; }
 int  bugbot_shim_blob_count(void) { return 0; }

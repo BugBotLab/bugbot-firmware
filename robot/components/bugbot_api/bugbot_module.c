@@ -215,12 +215,26 @@ static bool bb_reset_position(int argc, py_StackRef argv) { (void)argc; (void)ar
 
 /* ---- vision -------------------------------------------------------------- */
 
+/* set_cv(mode[, colour]): one detector at a time; "blob" needs the colour to track. */
 static bool bb_set_cv(int argc, py_StackRef argv) {
-    if (argc != 1 || !py_isstr(py_arg(0))) return TypeError("set_cv(mode) takes a string");
+    if (argc < 1 || argc > 2 || !py_isstr(py_arg(0))) return TypeError("set_cv(mode[, colour]) takes a string and an optional colour");
     const char *m = py_tostr(py_arg(0));
-    if (!bugbot_shim_set_cv(m)) return ValueError("set_cv: unknown mode '%s'", m);
+    const char *colour = NULL;
+    if (argc == 2) { if (!py_isstr(py_arg(1))) return TypeError("set_cv: the colour must be a string"); colour = py_tostr(py_arg(1)); }
+    if (!bugbot_shim_set_cv(m, colour)) return ValueError("set_cv: unknown mode '%s' (or a blob without a colour)", m);
     py_newnone(py_retval()); return true;
 }
+
+/* line(): [cx_px, angle_deg] of the line on the mat ahead, or [] */
+static bool bb_line(int argc, py_StackRef argv) {
+    (void)argc; (void)argv; float cx, angle;
+    if (!bugbot_shim_line(&cx, &angle)) { py_newlistn(py_retval(), 0); return true; }
+    py_newlistn(py_retval(), 2); py_Ref l = py_retval();
+    py_newint(py_list_getitem(l, 0), (py_i64)(cx + 0.5f)); py_newfloat(py_list_getitem(l, 1), angle); return true;
+}
+
+/* bumped(): the accelerometer felt a jolt in the last moment */
+static bool bb_bumped(int argc, py_StackRef argv) { (void)argc; (void)argv; py_newbool(py_retval(), bugbot_shim_bumped()); return true; }
 
 static bool bb_apriltags(int argc, py_StackRef argv) {
     (void)argc; (void)argv; int n = bugbot_shim_tag_count();
@@ -290,7 +304,8 @@ static const entry_t API[] = {
     {"distance", bb_distance}, {"tof_grid", bb_tof_grid}, {"heading", bb_heading}, {"position", bb_position},
     {"velocity", bb_velocity}, {"imu", bb_imu}, {"battery", bb_battery},
     {"reset_heading", bb_reset_heading}, {"reset_position", bb_reset_position},
-    {"set_cv", bb_set_cv}, {"apriltags", bb_apriltags}, {"blobs", bb_blobs}, {"edges", bb_edges}, {"faces", bb_faces},
+    {"set_cv", bb_set_cv}, {"apriltags", bb_apriltags}, {"blobs", bb_blobs}, {"line", bb_line}, {"edges", bb_edges}, {"faces", bb_faces},
+    {"bumped", bb_bumped},
     {"camera_suspend", bb_camera_suspend}, {"camera_resume", bb_camera_resume},
     {"motor_ok", bb_motor_ok}, {"motor_raw_test", bb_motor_raw_test},
 };

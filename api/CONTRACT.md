@@ -38,6 +38,7 @@ A function marked R P S behaves the same on all three. Nothing in version 1 is s
 | `stop()` | R P S | All motors off. |
 | `wait(seconds)` | R P S | Sleep, but keeps the deadman fed for the current motion and honours a stop request. |
 | `clock()` | R P S | Seconds since the program started, float. Simulated time in the sim. |
+| `bumped()` | R P S | True for about 0.3 s after the robot bumps into something (accelerometer jolt on the robot; a contact in the sim). |
 
 Removed: the laptop's tank-style `drive(left, right)`; `left`/`right` as spins.
 
@@ -70,9 +71,10 @@ Removed: `beep()`. The new robot has no buzzer. Lessons that used a beep use `le
 
 | Function | Targets | Returns |
 |---|---|---|
-| `set_cv(mode, colour=None)` | R P S | `"apriltag"`, `"blob"`, `"contour"`, `"face"`, `"none"`. Runs on the P4. `"blob"` needs the colour to track: `"red"`, `"green"`, `"blue"` or `"yellow"` (one detector, one colour at a time). |
+| `set_cv(mode, colour=None)` | R P S | `"apriltag"`, `"blob"`, `"line"`, `"contour"`, `"face"`, `"none"`. Runs on the P4. `"blob"` needs the colour to track: `"red"`, `"green"`, `"blue"` or `"yellow"` (one detector, one colour at a time). |
 | `apriltags()` | R P S | list of `[id, cx_px, cy_px, dist_cm]`. |
 | `blobs()` | R P S | list of `[cx, cy, area, x0, y0, x1, y1, aspect]`. |
+| `line()` | R P S | `[cx_px, angle_deg]` for the dark line on the mat ahead, `[]` if none in view. `cx` is where the line crosses the picture about 10 cm ahead (160 = under the nose); `angle` is its direction, positive to the right. Needs `set_cv("line")`. |
 | `edges()` | R P S | `[edge_count, dominant_angle_deg]`. |
 | `faces()` | R P S | list of `[x1, y1, x2, y2, score, [10 keypoints]]`. |
 | `camera_suspend()`, `camera_resume()` | R P S | Power the camera down and up. |
@@ -94,3 +96,6 @@ This document is version 1. Firmware, dongle, laptop library and IDE each report
 ## Conformance
 
 Each implementation carries the same test script, `api_conformance.py`, which calls every function in this table and checks types, ranges and units. It runs in the sim in CI, on the laptop against a robot in proxy mode, and on the robot in upload mode before a release.
+
+
+Tags on other robots: every BugBot wears an AprilTag on its body (ids from 100 up), so `apriltags()` reports other robots with their distance and bearing, the same as a marker. A lit LED on another robot shows up in `blobs()` as a small patch of the nearest named colour.
