@@ -47,11 +47,8 @@ Removed: the laptop's tank-style `drive(left, right)`; `left`/`right` as spins.
 | Function | Targets | Behaviour |
 |---|---|---|
 | `led(colour)` or `led(r, g, b)` | R P S | The one RGB LED. Colour names: red, green, blue, yellow, cyan, magenta, white, orange, purple, pink, off. |
-| `servo(index, angle)` | R P S | index 0 or 1, angle 0 to 180. |
-| `grip()` | R P S | Close the gripper (servo 0). Returns True if it closed on a ball (40 mm, ping-pong) within about 3 cm of the front. Blocks ~0.3 s. |
-| `release()` | R P S | Open the gripper, letting go of the ball. Blocks ~0.3 s. |
+| `servo(index, angle)` | R P S | index 0 or 1, angle 0 to 180. Non-blocking; a hobby servo needs about 0.4 s to get there. Servo 0 is the gripper: 90 closes the jaws (holding a 40 mm ball that is within about 3 cm of the front), 0 opens them. Servo 1 is the kicker, a continuous-rotation servo: 90 stops it, 91 turns it slowly clockwise; one turn (about a second) winds and releases the spring-loaded lever, which sends the ball in front about 45 cm along the heading. There are no grip/release/kick functions: lessons write them from `servo()` and `wait()`. |
 | `holding()` | R P S | The colour of the ball in the gripper, or None. |
-| `kick(power=100)` | R P S | Fire the kicker (servo 1): the ball in front, held or in reach, shoots off along the heading. Power 0 to 100; 100 sends a ball about 80 cm on the mat. Returns True if it hit a ball. Blocks ~0.3 s. |
 
 Removed: `beep()`. The new robot has no buzzer. Lessons that used a beep use `led()` instead.
 
@@ -85,6 +82,7 @@ There is no addressing: everyone hears everything, so a message that is meant fo
 | Function | Targets | Returns |
 |---|---|---|
 | `set_cv(mode, colour=None)` | R P S | `"apriltag"`, `"blob"`, `"line"`, `"contour"`, `"face"`, `"none"`. Runs on the P4. `"blob"` needs the colour to track: `"red"`, `"green"`, `"blue"` or `"yellow"` (one detector, one colour at a time). |
+| `marker_tags()`, `robot_tags()` | R P S | `apriltags()` split by id: markers on the mat are tags 0 to 99, every robot wears a tag from 100 up (100 + its slot in a game). Same list format, nearest first, same detector setting. |
 | `apriltags()` | R P S | list of `[id, cx_px, cy_px, dist_cm]`. |
 | `blobs()` | R P S | list of `[cx, cy, area, x0, y0, x1, y1, aspect]`. |
 | `line()` | R P S | `[cx_px, angle_deg]` for the dark line on the mat ahead, `[]` if none in view. `cx` is where the line crosses the picture about 10 cm ahead (160 = under the nose); `angle` is its direction, positive to the right. Needs `set_cv("line")`. |

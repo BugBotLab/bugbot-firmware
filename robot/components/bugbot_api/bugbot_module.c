@@ -246,17 +246,26 @@ static bool bb_send(int argc, py_StackRef argv) {
 /* messages(): [[from, text], ...] received since the last call; nothing until the radio exists */
 static bool bb_messages(int argc, py_StackRef argv) { (void)argc; (void)argv; py_newlistn(py_retval(), 0); return true; }
 
-static bool bb_apriltags(int argc, py_StackRef argv) {
-    (void)argc; (void)argv; int n = bugbot_shim_tag_count();
-    py_newlistn(py_retval(), n); py_Ref outer = py_retval();
+/* apriltags(): every tag in view; marker_tags() / robot_tags() the same list split by id (markers 0..99, robots 100+) */
+#define ROBOT_TAG_MIN 100
+static bool tags_filtered(int lo, int hi) {
+    int n = bugbot_shim_tag_count(), kept = 0;
+    py_newlistn(py_retval(), 0); py_Ref outer = py_retval();
     for (int i = 0; i < n; i++) {
         bugbot_tag_t t; if (!bugbot_shim_tag_get(i, &t)) continue;
-        py_newlistn(py_list_getitem(outer, i), 4); py_Ref in = py_list_getitem(outer, i);
+        if (t.id < lo || t.id >= hi) continue;
+        py_Ref in = py_list_emplace(outer);
+        py_newlistn(in, 4);
         py_newint(py_list_getitem(in, 0), t.id); py_newfloat(py_list_getitem(in, 1), t.cx);
         py_newfloat(py_list_getitem(in, 2), t.cy); py_newfloat(py_list_getitem(in, 3), t.dist_cm);
+        kept++;
     }
+    (void)kept;
     return true;
 }
+static bool bb_apriltags(int argc, py_StackRef argv)   { (void)argc; (void)argv; return tags_filtered(0, 1 << 30); }
+static bool bb_marker_tags(int argc, py_StackRef argv) { (void)argc; (void)argv; return tags_filtered(0, ROBOT_TAG_MIN); }
+static bool bb_robot_tags(int argc, py_StackRef argv)  { (void)argc; (void)argv; return tags_filtered(ROBOT_TAG_MIN, 1 << 30); }
 
 static bool bb_blobs(int argc, py_StackRef argv) {
     (void)argc; (void)argv; int n = bugbot_shim_blob_count();
@@ -314,7 +323,7 @@ static const entry_t API[] = {
     {"distance", bb_distance}, {"tof_grid", bb_tof_grid}, {"heading", bb_heading}, {"position", bb_position},
     {"velocity", bb_velocity}, {"imu", bb_imu}, {"battery", bb_battery},
     {"reset_heading", bb_reset_heading}, {"reset_position", bb_reset_position},
-    {"set_cv", bb_set_cv}, {"apriltags", bb_apriltags}, {"blobs", bb_blobs}, {"line", bb_line}, {"edges", bb_edges}, {"faces", bb_faces},
+    {"set_cv", bb_set_cv}, {"apriltags", bb_apriltags}, {"marker_tags", bb_marker_tags}, {"robot_tags", bb_robot_tags}, {"blobs", bb_blobs}, {"line", bb_line}, {"edges", bb_edges}, {"faces", bb_faces},
     {"bumped", bb_bumped}, {"send", bb_send}, {"messages", bb_messages},
     {"camera_suspend", bb_camera_suspend}, {"camera_resume", bb_camera_resume},
     {"motor_ok", bb_motor_ok}, {"motor_raw_test", bb_motor_raw_test},
