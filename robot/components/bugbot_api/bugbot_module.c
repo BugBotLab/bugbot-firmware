@@ -236,6 +236,16 @@ static bool bb_line(int argc, py_StackRef argv) {
 /* bumped(): the accelerometer felt a jolt in the last moment */
 static bool bb_bumped(int argc, py_StackRef argv) { (void)argc; (void)argv; py_newbool(py_retval(), bugbot_shim_bumped()); return true; }
 
+/* send(text): broadcast a short message over the robot radio (the dongle link); no radio yet, so it is dropped */
+static bool bb_send(int argc, py_StackRef argv) {
+    if (argc != 1) return TypeError("send(text) takes one argument");
+    if (py_isstr(py_arg(0))) bugbot_shim_send(py_tostr(py_arg(0)));
+    py_newnone(py_retval()); return true;
+}
+
+/* messages(): [[from, text], ...] received since the last call; nothing until the radio exists */
+static bool bb_messages(int argc, py_StackRef argv) { (void)argc; (void)argv; py_newlistn(py_retval(), 0); return true; }
+
 static bool bb_apriltags(int argc, py_StackRef argv) {
     (void)argc; (void)argv; int n = bugbot_shim_tag_count();
     py_newlistn(py_retval(), n); py_Ref outer = py_retval();
@@ -305,7 +315,7 @@ static const entry_t API[] = {
     {"velocity", bb_velocity}, {"imu", bb_imu}, {"battery", bb_battery},
     {"reset_heading", bb_reset_heading}, {"reset_position", bb_reset_position},
     {"set_cv", bb_set_cv}, {"apriltags", bb_apriltags}, {"blobs", bb_blobs}, {"line", bb_line}, {"edges", bb_edges}, {"faces", bb_faces},
-    {"bumped", bb_bumped},
+    {"bumped", bb_bumped}, {"send", bb_send}, {"messages", bb_messages},
     {"camera_suspend", bb_camera_suspend}, {"camera_resume", bb_camera_resume},
     {"motor_ok", bb_motor_ok}, {"motor_raw_test", bb_motor_raw_test},
 };

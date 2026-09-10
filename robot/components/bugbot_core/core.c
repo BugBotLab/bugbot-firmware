@@ -162,6 +162,8 @@ bool bugbot_shim_set_cv(const char *mode, const char *colour) {
 /* the line detector and the bump sense arrive with the camera pipeline and the IMU fusion; until then: nothing seen */
 bool bugbot_shim_line(float *cx_px, float *angle_deg) { (void)cx_px; (void)angle_deg; return false; }
 bool bugbot_shim_bumped(void) { return false; }
+/* the radio rides on the dongle link, which does not exist yet: messages are dropped */
+void bugbot_shim_send(const char *text) { (void)text; }
 int  bugbot_shim_tag_count(void) { return 0; }
 bool bugbot_shim_tag_get(int i, bugbot_tag_t *o) { (void)i; (void)o; return false; }
 int  bugbot_shim_blob_count(void) { return 0; }

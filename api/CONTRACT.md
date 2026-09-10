@@ -55,6 +55,15 @@ Removed: the laptop's tank-style `drive(left, right)`; `left`/`right` as spins.
 
 Removed: `beep()`. The new robot has no buzzer. Lessons that used a beep use `led()` instead.
 
+## Radio
+
+| Function | Targets | Behaviour |
+|---|---|---|
+| `send(text)` | R P S | Broadcast a short text message (up to 200 characters) to every other robot on the mat. Non-blocking. On the robot it goes over the dongle link, which relays it to the others. |
+| `messages()` | R P S | Every message received since the last call, oldest first, as `[from, text]` pairs (`from` is the sender's name). Your own messages are not included. |
+
+There is no addressing: everyone hears everything, so a message that is meant for one robot carries that robot's name in its text. In a game `me.send(text)` and `me.messages` do the same.
+
 ## Sensors
 
 | Function | Targets | Returns |
