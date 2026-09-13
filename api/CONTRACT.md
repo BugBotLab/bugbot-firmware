@@ -10,10 +10,11 @@ Draft 1, 9 September 2026. This is the student-facing surface that must behave i
 | P | proxy | runs on the laptop, each call goes to the robot through the dongle |
 | S | sim | runs in the browser IDE (or the Python package) against the simulated robot |
 
-A function marked R P S behaves the same on all three. Nothing in version 1 is single-target. A script starts with `import bugbot; bugbot.go()` on every target; `go()` connects where a connection is needed and injects every public name into the script's globals. `from bugbot import *` is the explicit equivalent.
+A function marked R P S behaves the same on all three. The exception is the piezo (`tone`, `no_tone`), simulator-only until the board that carries it. A script starts with `import bugbot; bugbot.go()` on every target; `go()` connects where a connection is needed and injects every public name into the script's globals. `from bugbot import *` is the explicit equivalent.
 
 ## Conventions
 
+- Number arguments must be numbers (`int` or `float`). Text is refused with `TypeError("forward: distance must be a number, not the text '35'. input() gives text: make it a number with int() or float()")`, the sentence about `input()` only when the text looks like a number, and never converted, so a value typed into `input()` behaves the same on every target and learners meet the type error Python itself would give.
 - Speed: 0 to 100, percent of full power. Out-of-range values are clamped silently.
 - Distance: centimetres. Velocity: centimetres per second.
 - Angles: degrees. Heading is 0 to 360, clockwise positive, absolute from the IMU's magnetometer; `reset_heading()` makes the current facing 0.
@@ -50,7 +51,10 @@ Removed: the laptop's tank-style `drive(left, right)`; `left`/`right` as spins.
 | `servo(index, angle)` | R P S | index 0 or 1, angle 0 to 180. Non-blocking; a hobby servo needs about 0.4 s to get there. Servo 0 is the gripper: 90 closes the jaws (holding a 40 mm ball that is within about 3 cm of the front), 0 opens them. Servo 1 is the kicker, a continuous-rotation servo: 90 stops it, 91 turns it slowly clockwise; one turn (about a second) winds and releases the spring-loaded lever, which sends the ball in front about 45 cm along the heading. There are no grip/release/kick functions: lessons write them from `servo()` and `wait()`. |
 | `holding()` | R P S | The colour of the ball in the gripper, or None. |
 
-Removed: `beep()`. The new robot has no buzzer. Lessons that used a beep use `led()` instead.
+| `tone(freq, seconds=None)` | S now; R P with the piezo board | A passive piezo: a square wave at `freq` hertz, 100 to 10000, loudest near its resonance (a few kilohertz). With `seconds` it blocks until the note is done and then stops; without, it plays until the next `tone()` or `no_tone()`. `tone(0)` is silence. |
+| `no_tone()` | S now; R P with the piezo board | Silence the piezo. |
+
+Removed: `beep()`. Added on 13 September 2026: `tone()` and `no_tone()` for a passive piezo, which the simulated robot has now and a later board version adds (one PWM-capable GPIO, a transistor driver and the piezo). Until then the robot and the laptop library raise `RuntimeError("BugBot: this robot has no piezo")` from both, rather than doing nothing. These two are the only functions in version 1 not on every target, and only until that board.
 
 ## Radio
 
