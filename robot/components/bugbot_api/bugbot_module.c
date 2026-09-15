@@ -16,6 +16,7 @@
 #include "bugbot_shims.h"
 #include <math.h>
 #include <string.h>
+#include <strings.h>
 
 #define TURN_SPEED    30.0f
 #define DEFAULT_SPEED 50.0f
@@ -122,17 +123,24 @@ static bool bb_drive(int argc, py_StackRef argv) {
 static bool bb_stop(int argc, py_StackRef argv) { (void)argc; (void)argv; bugbot_shim_stop(); py_newnone(py_retval()); return true; }
 
 /* wait(seconds): keeps the deadman fed, honours stop. */
-static bool bb_wait(int argc, py_StackRef argv) {
-    if (argc != 1) return TypeError("wait(seconds) takes 1 argument");
-    float s; if (!get_float(argv, 0, &s)) return false;
+/* Sleep in 10 ms chunks, feeding the deadman and honouring Stop. Returns false (with the error raised) if stopped. */
+static bool sleep_ms(uint32_t ms) {
     if (bugbot_shim_should_stop()) return raise_stopped();
-    uint32_t ms = (uint32_t)(s * 1000.0f), elapsed = 0;
+    uint32_t elapsed = 0;
     while (elapsed < ms) {
         uint32_t chunk = (ms - elapsed > 10) ? 10 : (ms - elapsed);
         bugbot_shim_delay_ms(chunk); elapsed += chunk;
         bugbot_shim_keepalive();
         if (bugbot_shim_should_stop()) return raise_stopped();
     }
+    return true;
+}
+
+static bool bb_wait(int argc, py_StackRef argv) {
+    if (argc != 1) return TypeError("wait(seconds) takes 1 argument");
+    float s; if (!get_float(argv, 0, &s)) return false;
+    if (s < 0) s = 0;
+    if (!sleep_ms((uint32_t)(s * 1000.0f))) return false;
     py_newnone(py_retval()); return true;
 }
 
@@ -174,6 +182,40 @@ static bool bb_servo(int argc, py_StackRef argv) {
     if (deg < 0) deg = 0;
     if (deg > 180) deg = 180;
     bugbot_shim_servo((uint8_t)idx, deg);
+    py_newnone(py_retval()); return true;
+}
+
+#define GRIPPER_TRAVEL_MS 400   /* the gripper servo swinging the jaws from open to closed */
+#define KICK_TURN_MS      1000  /* one turn of the kicker servo: winds the spring and lets it go */
+
+/* gripper("open") or gripper(1) opens the jaws, gripper("close") or gripper(0) closes them; waits while they move */
+static bool bb_gripper(int argc, py_StackRef argv) {
+    if (argc != 1) return TypeError("gripper(state) takes 1 argument: \"open\" or \"close\"");
+    py_Ref a = py_arg(0);
+    float deg = -1;
+    if (py_isstr(a)) {
+        const char *w = py_tostr(a);
+        if (strcasecmp(w, "open") == 0) deg = 0;
+        else if (strcasecmp(w, "close") == 0 || strcasecmp(w, "closed") == 0) deg = 90;
+    } else if (py_isint(a) && !py_isbool(a)) {
+        py_i64 v = py_toint(a);
+        if (v == 1) deg = 0;
+        else if (v == 0) deg = 90;
+    }
+    if (deg < 0) return ValueError("gripper: use \"open\" or \"close\" (or 1 to open, 0 to close)");
+    bugbot_shim_servo(0, deg);
+    if (!sleep_ms(GRIPPER_TRAVEL_MS)) return false;
+    py_newnone(py_retval()); return true;
+}
+
+/* kick(): one turn of the continuous-rotation kicker servo, then stop it */
+static bool bb_kick(int argc, py_StackRef argv) {
+    (void)argv;
+    if (argc != 0) return TypeError("kick() takes no arguments");
+    bugbot_shim_servo(1, 91);
+    bool ok = sleep_ms(KICK_TURN_MS);
+    bugbot_shim_servo(1, 90);                   /* stopped even when the script was */
+    if (!ok) return false;
     py_newnone(py_retval()); return true;
 }
 
@@ -319,7 +361,7 @@ static const entry_t API[] = {
     {"forward", bb_forward}, {"backward", bb_backward}, {"left", bb_left}, {"right", bb_right},
     {"spin_left", bb_spin_left}, {"spin_right", bb_spin_right}, {"turn", bb_turn}, {"drive", bb_drive},
     {"stop", bb_stop}, {"wait", bb_wait}, {"clock", bb_clock},
-    {"led", bb_led}, {"servo", bb_servo},
+    {"led", bb_led}, {"servo", bb_servo}, {"gripper", bb_gripper}, {"kick", bb_kick},
     {"distance", bb_distance}, {"tof_grid", bb_tof_grid}, {"heading", bb_heading}, {"position", bb_position},
     {"velocity", bb_velocity}, {"imu", bb_imu}, {"battery", bb_battery},
     {"reset_heading", bb_reset_heading}, {"reset_position", bb_reset_position},
