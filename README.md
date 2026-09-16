@@ -2,7 +2,7 @@
 
 Firmware for the BugBot robot (ESP32-P4 on the Vision board) and for the USB dongle. C under ESP-IDF, with the pocketpy Python interpreter on top: students' programs are Python, the firmware owns everything with a deadline.
 
-Part of the [BugBot open-source plan](https://github.com/BugBotLab). The Python surface is defined by [api/CONTRACT.md](api/CONTRACT.md) (contract v1) and is the same on the robot, in the simulator and from the laptop.
+Part of the [BugBot open-source plan](https://github.com/BugBotLab). The robot and the free lessons are at [bugbotlab.com](https://www.bugbotlab.com/). The Python surface is defined by [api/CONTRACT.md](api/CONTRACT.md) (contract v1) and is the same on the robot, in the simulator and from the laptop.
 
 ## Status
 
