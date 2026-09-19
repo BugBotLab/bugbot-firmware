@@ -99,6 +99,25 @@ There is no addressing: everyone hears everything, so a message that is meant fo
 
 In the sim, vision functions run on the rendered camera view, so the same lesson code works. `tinyml_result()` is dropped from version 1 and returns when the P4 model pipeline is defined.
 
+## Showing what the program sees
+
+Added 19 September 2026. These do nothing to the robot. In the sim they draw on the page; on the robot and in proxy mode they send what the program wants to see back to the laptop, where the dashboard's Charts window draws it, and `plot()` data is saved as `<script>_plot.csv` when the program ends.
+
+| Function | Targets | Behaviour |
+|---|---|---|
+| `plot(name, value)` | R P S | Add a point to a chart. Up to eight named lines. |
+| `draw(name, points, colour="yellow", style="dots", size=None)` | R P S | Draw a layer: `points` is a list of `(x, y)` in cm; `style` is `"dots"`, `"line"` or `"squares"`. Drawing a name again replaces it. Up to eight layers, 2000 points each. |
+| `trace(name, ..., every="change")` | R P S | Print a trace table as the program runs: a column for each variable named (as text), and a new row, headed by the line that changed it, whenever one of them changes. `every="row"` writes every value on every row. On the robot it watches only the program's top-level variables. |
+
+On the robot and in proxy mode each `plot()` and `draw()` call is one line of output, tagged so the laptop can tell it from the program's own `print()` lines (fields separated by a tab):
+
+```
+#BB  plot  <seconds>  <name>  <value>
+#BB  draw  <name>  <colour>  <style>  <size or empty>  <x>,<y>;<x>,<y>;...
+```
+
+`trace()` prints ordinary lines, because its table is meant to be read. Until the firmware defines these three natively, the laptop library adds Python versions of them to the first line of an uploaded script (`bugbot-python/bugbot/_report.py`), so line numbers do not move; for `trace()` it also adds a check after each simple statement, since pocketpy has no trace hook.
+
 ## Diagnostics (not for lessons)
 
 `motor_ok()`, `motor_raw_test(ms)` stay on the robot for bring-up. They are not part of the contract and may change.
