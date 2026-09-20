@@ -1,6 +1,6 @@
 # BugBot `bugbot` API contract, version 1
 
-Draft 1, 9 September 2026. This is the student-facing surface that must behave identically on every target. It supersedes the surface described in the old docs (`docs/python-api/`) and implemented in `bugbot_module.c` (robot, pocketpy) and `Code/Software/bugbot` (laptop). Decisions from the 9 September discussion are baked in: pocketpy stays as the robot interpreter; there is no buzzer on the new robot.
+The student-facing surface, which must behave the same on the robot, from the laptop and in the simulator. It is the single reference for all three, and it replaces the earlier surface in `docs/python-api/`. The robot runs student code in pocketpy, and the current robot has no buzzer, so the piezo functions are simulator-only.
 
 ## Targets
 
